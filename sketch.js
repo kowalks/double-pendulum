@@ -1,7 +1,3 @@
-function preload() {
-//	refresh = loadImage('refresh.png');
-}
-
 function setup() {
 	createCanvas(1000, 1000);
 	controls = createGraphics(100, 100);
@@ -24,13 +20,15 @@ function setup() {
 	largeAngle = createButton('Ângulos grandes');
 }
 
+let precision = 1000;
+
 let PI = 3.14159265;
 
 let r1 = 1; let r2 = 1; let m1 = 10; let m2 = 10;
 let a1 = 10 * PI / 180; let a2 = 10 * PI / 180;
 let a1_v = 0; let a2_v = 0; let a1_a = 0; let a2_a = 0;
 let g = 10;
-let timestep = 1/60000;
+let timestep = 1/(60*precision);
 let line1 = [];
 let line2 = [];
 
@@ -45,8 +43,8 @@ function draw() {
 	strokeWeight(2);
 
 	draw_param();
-		for (let i = 0; i < 1000; i++)
-			update_pendulum();
+	for (let i = 0; i < precision; i++)
+		update_pendulum();
 	draw_pendulum();
 	draw_plot();
 	draw_energia();
@@ -58,7 +56,7 @@ function draw_plot() {
 	plot.strokeWeight(1);
 	line1.unshift(a1_v);
 	line2.unshift(a2_v);
-	veloscale = 75/max(max(line1), max(line2));
+	veloscale = 75/-min(min(line1), min(line2));
 	if (line1.length > 500){
 		line1.pop();
 		line2.pop();
@@ -79,6 +77,7 @@ function draw_plot() {
 		plot.vertex(i+40, -veloscale*line2[i]+100);
 	plot.endShape();
 
+	plot.stroke(100);
 	plot.line(40,10,40,190);
 	plot.line(40,100,530, 100);
 	plot.fill(10,100,100);
@@ -114,31 +113,22 @@ function draw_energia() {
 	energia.beginShape();
 	energia.noFill();
 	energia.stroke(10, 100, 100);
-	for (let i = 0; i < cin.length; i++) {
-		// i+100 é para deslocar 100 unidades p direita
-		// wave[i]+100 é pra deslocar 100 unidades p cima
+	for (let i = 0; i < cin.length; i++)
 		energia.vertex(i+40, 190-energyscale*cin[i]);
-	}
 	energia.endShape();
 
 	energia.beginShape();
 	energia.noFill();
 	energia.stroke(100, 10, 100);
-	for (let i = 0; i < pot.length; i++) {
-		// i+100 é para deslocar 100 unidades p direita
-		// wave[i]+100 é pra deslocar 100 unidades p cima
+	for (let i = 0; i < pot.length; i++)
 		energia.vertex(i+40, 190-energyscale*pot[i]);
-	}
 	energia.endShape();
 
 	energia.beginShape();
 	energia.noFill();
 	energia.stroke(100, 100, 10);
-	for (let i = 0; i < pot.length; i++) {
-		// i+100 é para deslocar 100 unidades p direita
-		// wave[i]+100 é pra deslocar 100 unidades p cima
+	for (let i = 0; i < pot.length; i++)
 		energia.vertex(i+40, 190-energyscale*(pot[i] + cin[i]));
-	}
 	energia.endShape();
 	
 	energia.stroke(100);
@@ -204,7 +194,6 @@ function draw_pendulum() {
 	let x2 = x1 + r2 * sin(a2);
 	let y2 = y1 + r2 * cos(a2);
 
-	pendulum.stroke(0)
 	pendulum.line(0, 0, pendulumscale*x1, pendulumscale*y1);
 	pendulum.line(pendulumscale*x1, pendulumscale*y1, pendulumscale*x2, pendulumscale*y2);
 	pendulum.fill(0);
@@ -230,8 +219,8 @@ function smallAngles() {
 }
 
 function largeAngles() {
-	slidera1.value(60);
-	slidera2.value(120);
+	slidera1.value(75);
+	slidera2.value(100);
 	refresh_pendulum();
 }
 
@@ -252,23 +241,3 @@ function refresh_pendulum() {
 	line1=[];
 	line2=[];
 }
-
-/*
-// adiciona 300*a1_v para o começo do array wave
-wavev1.unshift(300*a1_v);
-	
-// desenha uma linha conectando os pontos da wave
-// isso serve pra linha do gráfico ficar "contínua"
-beginShape();
-noFill();
-for (let i = 0; i < wavev1.length; i++) {
-	// i+100 é para deslocar 100 unidades p direita
-	// wave[i]+100 é pra deslocar 100 unidades p cima
-	vertex(i+100, wavev1[i]+100);
-}
-endShape();
-
-// para apagar o "final" do gráfico que não é mais visível
-if (wavev1.length > 400) {
-	wavev1.pop();
-} */
